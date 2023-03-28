@@ -132,7 +132,7 @@ def get_systeminfo():
                 gpu_name = "\nType of GPU: " + gpu.name
                 gpu_free_memory = "\nAvailable GPU memory: " + f"{gpu.memoryFree}MB"
                 gpu_total_memory = "\nTotal GPU memory: " f"{gpu.memoryTotal}MB"
-                gpu_temperature = "\nGPU temperature: " f"{gpu.temperature} °C"
+                gpu_temperature = "\nGPU temperature: " f"{gpu.temperature}C"
         except:
             pass
 

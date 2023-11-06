@@ -1,4 +1,4 @@
-import subprocess,os,psutil,platform,requests,socket,ctypes,sys, win32api, threading, re
+import subprocess,os,psutil,platform,requests,socket,ctypes,sys, win32api, threading, re, time, uuid
 
 
 class AntiDebug:

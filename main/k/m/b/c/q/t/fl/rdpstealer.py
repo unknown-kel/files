@@ -1,4 +1,4 @@
-import subprocess,os,psutil,platform,requests,socket,ctypes,sys, win32api, threading
+import subprocess,os,psutil,platform,requests,socket,ctypes,sys, win32api, threading, re
 
 
 class AntiDebug:
@@ -100,7 +100,6 @@ class AntiDebug:
 
         _, diskSizeBytes, _ = win32api.GetDiskFreeSpaceEx()
         diskSizeGB = diskSizeBytes / 1073741824
-
         if diskSizeGB < self.MIN_DISK_SIZE_GB:
             os._exit(1)
 

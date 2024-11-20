@@ -47,5 +47,14 @@
         ],
         "id": "6585385890",
         "status": "Active"
+    },
+    "medofficiel": {
+        "password": "goulmima",
+        "activation_key": "B3492BDF01552DEF3379B19B7355402B",
+        "devices": [
+            "B3492BDF01552DEF3379B19B7355402B"
+        ],
+        "id": "798705872",
+        "status": "Active"
     }
 }

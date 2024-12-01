@@ -57,5 +57,14 @@
         ],
         "id": "798705872",
         "status": "Active"
+    }, 
+    "epi421": {
+        "password": "Bonjour2019@@..",
+        "activation_key": "4A55A8C0DDD86EECBA53FFA8B9AE8ACA",
+        "devices": [
+            "4A55A8C0DDD86EECBA53FFA8B9AE8ACA"
+        ],
+        "id": "5179093115",
+        "status": ""
     }
 }

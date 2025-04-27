@@ -6,6 +6,13 @@
             "tool_name": "Wimp mailer",
             "timestamp": "2025-04-27 12:45:02",
             "details": {}
+        },
+        {
+            "action": "delete",
+            "username": "test6",
+            "tool_name": "Wimp mailer",
+            "timestamp": "2025-04-27 12:45:03",
+            "details": {}
         }
     ]
 }

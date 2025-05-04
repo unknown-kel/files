@@ -1,6 +1,5 @@
 {
     "tools": {
-        "Wimp mailer": "u-wimpmailer.json",
-        "test tool": "tool_users.json"
+        "Wimp mailer": "u-wimpmailer.json"
     }
 }

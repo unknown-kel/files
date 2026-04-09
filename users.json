@@ -72,5 +72,14 @@
         ],
         "id": "5534516184",
         "status": ""
+    },        
+    "braisn5245": {
+        "password": "Dollar10$euro",
+        "activation_key": "6899836D9584128CC9FE74B9F386B775",
+        "devices": [
+            "6899836D9584128CC9FE74B9F386B775"
+        ],
+        "id": "braisn5245",
+        "status": "Active"
     }
 }
